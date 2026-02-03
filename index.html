@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>I Love You BBY &lt;3</title>
+
+<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
+
+<style>
+:root{
+  --pink:#ff3b7a;
+  --pink-dark:#ff1f68;
+  --bg1:#ffd6e7;
+  --bg2:#ffeef6;
+}
+
+*{box-sizing:border-box}
+html,body{height:100%;}
+
+body{
+  margin:0;
+  min-height:100vh;
+  display:grid;
+  place-items:center;
+  background:radial-gradient(circle at top,var(--bg2),var(--bg1));
+  font-family:system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+  overflow:hidden;
+}
+
+/* ================= COVER (fixed layout) ================= */
+#cover{
+  position:fixed;
+  inset:0;
+  z-index:99999;
+  display:grid;
+  place-items:center;
+  background:radial-gradient(circle at top,var(--bg2),var(--bg1));
+  transition:opacity .6s ease, visibility .6s ease;
+}
+
+/* cover-card: use flex column with an explicit gap and min-height so content can't overlap */
+.cover-card{
+  background:#ffffffee;
+  padding:36px 28px 40px;
+  border-radius:26px;
+  box-shadow:0 18px 60px rgba(0,0,0,.18);
+
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  gap:20px;              /* more vertical breathing room */
+  text-align:center;
+
+  max-width:360px;       /* constrain width so text wraps predictably */
+  width:90%;
+  min-height:140px;      /* prevents vertical compression that caused overlap */
+
+  /* softer floating so the card doesn't 'bump' into children */
+  animation:float 4.5s ease-in-out infinite;
+}
+
+@keyframes float{
+  0%,100%{transform:translateY(0)}
+  50%{transform:translateY(-4px)}
+}
+
+.cover-card h2{
+  margin:0;
+  font-size:24px;
+  font-weight:900;
+  color:var(--pink);
+  line-height:1.25;     /* prevents multi-line overlap */
+  word-break:break-word;
+}
+
+.cover-card p{
+  margin:0;
+  font-size:14px;
+  opacity:.78;
+}
+
+/* ensure the button is separate and never collides with heading */
+.cover-card button{
+  margin-top:8px;       /* explicit separation */
+  padding:12px 36px;
+  border:none;
+  border-radius:999px;
+  font-size:15px;
+  font-weight:800;
+  cursor:pointer;
+  background:var(--pink);
+  color:#fff;
+  box-shadow:0 10px 24px rgba(0,0,0,.14);
+  transition: transform .18s ease, box-shadow .18s ease, background .12s;
+}
+.cover-card button:hover{ background:var(--pink-dark); transform:translateY(-2px); }
+
+/* smaller screens: keep spacing but reduce sizes */
+@media (max-width:420px){
+  .cover-card{ padding:28px 18px; gap:14px; min-height:120px; max-width:320px; }
+  .cover-card h2{ font-size:20px; }
+  .cover-card button{ padding:10px 28px; font-size:14px; }
+}
+
+/* ================= BACKGROUND LAYERS ================= */
+#confettiCanvas,#hearts{
+  position:fixed;
+  inset:0;
+  pointer-events:none;
+}
+
+/* ================= MAIN CARD ================= */
+.card{
+  width:min(720px,92vw);
+  background:#ffffffee;
+  border-radius:22px;
+  padding:24px;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  gap:18px;
+  box-shadow:0 18px 60px rgba(0,0,0,.15);
+  animation:breathe 9s ease-in-out infinite;
+  z-index:2;
+}
+
+@keyframes breathe{
+  0%,100%{transform:scale(1)}
+  50%{transform:scale(1.005)}
+}
+
+.art{
+  width:100%;
+  max-height:40vh;
+  object-fit:contain;
+  filter:drop-shadow(0 14px 18px rgba(0,0,0,.18));
+}
+
+h1{
+  margin:0;
+  text-align:center;
+  font-size:clamp(22px,4vw,36px);
+  font-weight:900;
+  color:var(--pink);
+}
+
+/* ================= BUTTONS ================= */
+.button-zone{
+  position:relative;
+  width:100%;
+  max-width:520px;
+  height:120px;
+}
+
+button.app-btn{
+  position:absolute;
+  top:50%;
+  transform:translate(-50%,-50%);
+  padding:14px 26px;
+  border-radius:999px;
+  border:none;
+  font-size:16px;
+  font-weight:800;
+  cursor:pointer;
+  box-shadow:0 10px 24px rgba(0,0,0,.14);
+  transition:left .25s ease, transform .18s ease, opacity .4s, box-shadow .4s;
+}
+
+#yesBtn{
+  left:18%;
+  background:var(--pink);
+  color:#fff;
+}
+
+#yesBtn.centered{
+  box-shadow:
+    0 0 0 6px rgba(255,59,122,.18),
+    0 0 32px rgba(255,59,122,.55),
+    0 10px 24px rgba(0,0,0,.14);
+}
+
+#noBtn{
+  left:70%;
+  background:#e5e7eb;
+}
+
+/* small yes-inner pulse (unchanged) */
+.yes-inner{ display:inline-block; animation:pulse 1.2s ease-in-out infinite; }
+@keyframes pulse{ 0%{transform:scale(1)} 50%{transform:scale(1.08)} 100%{transform:scale(1)} }
+
+/* ================= TEXT/RESULT ================= */
+.hint{ font-size:13px; opacity:.7; }
+
+.result{ display:none; width:100%; text-align:center; }
+
+.result h2{ margin:0; font-size:clamp(22px,3vw,30px); color:var(--pink); }
+
+.fireworks{ width:min(320px,80%); }
+
+/* ================= HEARTS ================= */
+.heart{
+  position:absolute;
+  bottom:-40px;
+  opacity:0;
+  animation:floatUp linear forwards;
+}
+@keyframes floatUp{
+  0%{transform:translateX(0) translateY(0) scale(var(--s));opacity:0}
+  15%{opacity:1}
+  100%{transform:translateX(var(--x)) translateY(-120vh) scale(var(--s));opacity:0}
+}
+</style>
+</head>
+<body>
+
+<!-- COVER -->
+<div id="cover" aria-hidden="false">
+  <div class="cover-card" role="dialog" aria-label="Start cover">
+    <h2>You ready Bubu 💕</h2>
+    <p>Tap to begin</p>
+    <button id="startBtn" aria-label="Start the experience">Start</button>
+  </div>
+</div>
+
+<canvas id="confettiCanvas"></canvas>
+<div id="hearts" aria-hidden="true"></div>
+
+<main class="card" role="main" aria-live="polite">
+  <img class="art" src="image-removebg-preview.png" alt="Valentine Chinchilla">
+  <h1>Chammo — Will you be my Valentine?</h1>
+
+  <section class="button-zone" id="zone" aria-label="Choices area">
+    <button id="yesBtn" class="app-btn"><span class="yes-inner">Yes</span></button>
+    <button id="noBtn" class="app-btn">No</button>
+  </section>
+
+  <div class="hint" id="hint">"NO" is not an option 😈</div>
+
+  <div class="result" id="result">
+    <h2>I Love You ❤️</h2>
+    <img class="fireworks"
+      src="https://media3.giphy.com/media/v1.Y2lkPTc5MGI3NjExZHowaGRkb2xvdjFhdnFwdDM1OWx3YXBxOGpqbTY1dTY0cHJxMHp6dSZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/mChMqNofy9yXzyrXfe/giphy.gif"
+      alt="Celebration">
+  </div>
+</main>
+
+<audio id="bgMusic" loop preload="auto">
+  <source src="music.mp3" type="audio/mpeg">
+</audio>
+
+<script>
+/* COVER START + MUSIC */
+const cover = document.getElementById('cover');
+const startBtn = document.getElementById('startBtn');
+const bgMusic = document.getElementById('bgMusic');
+
+startBtn.addEventListener('click', () => {
+  // start music with fade
+  bgMusic.volume = 0;
+  bgMusic.play().then(() => {
+    let v = 0;
+    const fade = setInterval(() => {
+      v += 0.02;
+      bgMusic.volume = Math.min(v, 0.5);
+      if (v >= 0.5) clearInterval(fade);
+    }, 100);
+  }).catch(()=>{ /* ignore autoplay errors */ });
+
+  // hide cover cleanly
+  cover.style.opacity = '0';
+  cover.style.visibility = 'hidden';
+  cover.setAttribute('aria-hidden','true');
+});
+
+/* ORIGINAL LOGIC (Yes/No, confetti, hearts) */
+const zone = document.getElementById('zone');
+const yesBtn = document.getElementById('yesBtn');
+const noBtn = document.getElementById('noBtn');
+const hint = document.getElementById('hint');
+const result = document.getElementById('result');
+const hearts = document.getElementById('hearts');
+
+const confettiInstance = confetti.create(document.getElementById('confettiCanvas'), { resize: true, useWorker: true });
+
+let yesScale = 1, yesProgress = 0, snapped = false;
+
+function growYes(){
+  yesProgress = Math.min(1, yesProgress + 0.025);
+  yesScale = 1 + yesProgress * 1.6;
+  yesBtn.style.left = (18 + yesProgress * (50 - 18)) + '%';
+  yesBtn.style.transform = `translate(-50%,-50%) scale(${yesScale})`;
+  if (yesProgress === 1 && !snapped){
+    snapped = true;
+    yesBtn.classList.add('centered');
+  }
+}
+
+function clamp(n,min,max){ return Math.max(min, Math.min(max, n)); }
+function moveNo(px,py){
+  const z = zone.getBoundingClientRect();
+  const b = noBtn.getBoundingClientRect();
+  let dx = (b.left + b.width/2) - px;
+  let dy = (b.top + b.height/2) - py;
+  let mag = Math.hypot(dx, dy) || 1;
+  dx /= mag; dy /= mag;
+  noBtn.style.left = clamp((b.left - z.left) + dx * 260, 0, z.width - b.width) + 'px';
+  noBtn.style.top  = clamp((b.top  - z.top)  + dy * 260, 0, z.height - b.height) + 'px';
+  growYes();
+}
+
+zone.addEventListener('pointermove', e => {
+  if (noBtn.style.display === 'none') return;
+  const b = noBtn.getBoundingClientRect();
+  const d = Math.hypot((b.left + b.width/2) - e.clientX, (b.top + b.height/2) - e.clientY);
+  if (d < 220) moveNo(e.clientX, e.clientY);
+});
+
+setTimeout(() => {
+  noBtn.style.opacity = '0';
+  setTimeout(()=> noBtn.style.display = 'none', 400);
+}, 15000);
+
+function spawnHeart(){
+  if (hearts.children.length > 600) return;
+  const h = document.createElement('div');
+  h.className = 'heart';
+  h.textContent = '❤';
+  h.style.setProperty('--s', 0.6 + Math.random() * 1.2);
+  h.style.setProperty('--x', (Math.random() - 0.5) * 40 + 'vw');
+  h.style.left = Math.random() * 100 + 'vw';
+  h.style.fontSize = 14 + Math.random() * 28 + 'px';
+  h.style.color = ['#ff4d7d', '#ff87b7', '#ff6b9a', '#ffb3c7'][Math.floor(Math.random()*4)];
+  const dur = 8000 + Math.random()*6000;
+  h.style.animationDuration = dur + 'ms';
+  hearts.appendChild(h);
+  setTimeout(()=> h.remove(), dur);
+}
+
+function startHearts(){
+  for (let i=0;i<40;i++) setTimeout(spawnHeart, i*120);
+  setInterval(spawnHeart, 80);
+}
+
+yesBtn.addEventListener('click', () => {
+  zone.style.display = 'none';
+  hint.style.display = 'none';
+  result.style.display = 'block';
+  confettiInstance({ particleCount: 300, spread: 140, startVelocity: 60 });
+  startHearts();
+});
+</script>
+</body>
+</html>
